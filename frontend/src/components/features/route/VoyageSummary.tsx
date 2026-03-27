@@ -45,6 +45,7 @@ export const VoyageSummary: React.FC<VoyageSummaryProps> = ({
     mapRef.current = L.map(mapContainerRef.current, {
       zoomControl: false,
       attributionControl: false,
+      maxZoom: 13,
     });
 
     // ESRI Ocean Basemap - clean marine chart with simple green land

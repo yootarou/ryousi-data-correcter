@@ -14,7 +14,7 @@ const RoutePage = () => {
   const { recordId } = useParams<{ recordId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { routePoints, deployments, isLoading, reload } = useRouteData(recordId);
+  const { routePoints, deployments, retrievals, isLoading, reload } = useRouteData(recordId);
   const tracking = useGPSTracking(recordId);
   const [record, setRecord] = useState<FishingRecord | null>(null);
   const [showSummary, setShowSummary] = useState(false);
@@ -70,6 +70,8 @@ const RoutePage = () => {
         )
       : 0;
   const totalDistanceKm = calculateTotalDistance(routePoints);
+  const retrievalByDeploymentId = new Map(retrievals.map((retrieval) => [retrieval.deployment_id, retrieval]));
+  const sortedDeployments = [...deployments].sort((a, b) => a.line_number - b.line_number);
 
   const handleFinish = async () => {
     // Stop tracking and flush remaining buffer
@@ -147,6 +149,66 @@ const RoutePage = () => {
         currentPosition={tracking.currentPosition}
         isTracking={tracking.isTracking}
       />
+
+      {/* Route Actions */}
+      <div className="grid grid-cols-2 gap-2">
+        <Link
+          to={`/deployment/${recordId}`}
+          className="inline-flex items-center justify-center py-3 px-4 bg-ocean-100 text-ocean-700 rounded-xl font-semibold text-sm min-h-[44px] transition-colors duration-150 hover:bg-ocean-200"
+        >
+          投縄記録
+        </Link>
+        <Link
+          to={`/return/${recordId}`}
+          className="inline-flex items-center justify-center py-3 px-4 bg-sea-100 text-sea-700 rounded-xl font-semibold text-sm min-h-[44px] transition-colors duration-150 hover:bg-sea-200"
+        >
+          帰港
+        </Link>
+      </div>
+
+      {/* Deployment Status */}
+      {sortedDeployments.length > 0 && (
+        <div className="card">
+          <h2 className="text-gray-700 mb-3">投縄状況</h2>
+          <div className="space-y-2">
+            {sortedDeployments.map((deployment) => {
+              const retrieval = retrievalByDeploymentId.get(deployment.id);
+              const isRetrieved = Boolean(retrieval);
+              return (
+                <button
+                  key={deployment.id}
+                  type="button"
+                  disabled={isRetrieved}
+                  onClick={() => navigate(`/retrieval/${deployment.id}`)}
+                  className={`w-full text-left rounded-lg border p-3 transition-colors ${
+                    isRetrieved
+                      ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed'
+                      : 'border-ocean-200 bg-white hover:bg-ocean-50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-gray-800">投縄 #{deployment.line_number}</p>
+                    <span
+                      className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                        isRetrieved ? 'bg-gray-200 text-gray-600' : 'bg-ocean-100 text-ocean-700'
+                      }`}
+                    >
+                      {isRetrieved ? '回収済み' : '投縄中'}
+                    </span>
+                  </div>
+                  <p className="text-xs mt-2 text-gray-500">時刻: {deployment.deployment_time}</p>
+                  <p className="text-xs mt-1 text-gray-500">
+                    座標: {deployment.position.latitude.toFixed(4)}, {deployment.position.longitude.toFixed(4)}
+                  </p>
+                  {isRetrieved && retrieval && (
+                    <p className="text-xs mt-1 text-gray-400">回収時刻: {retrieval.retrieval_time}</p>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Route Stats */}
       {totalPoints > 0 && (

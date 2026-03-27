@@ -13,22 +13,6 @@ interface FishingSpotMapProps {
   onSelectRoute: (route: RouteData | null) => void;
 }
 
-// Fish mode colors by catch weight
-function getSpotColor(retrieval?: SpotData['retrieval']): string {
-  if (!retrieval) return '#94a3b8';
-  const totalKg = retrieval.species_catches.reduce((s, c) => s + c.weight_kg, 0);
-  if (totalKg >= 50) return '#ef4444';
-  if (totalKg >= 20) return '#f59e0b';
-  if (totalKg > 0) return '#3b82f6';
-  return '#94a3b8';
-}
-
-function getSpotRadius(retrieval?: SpotData['retrieval']): number {
-  if (!retrieval) return 6;
-  const totalKg = retrieval.species_catches.reduce((s, c) => s + c.weight_kg, 0);
-  return Math.max(6, Math.min(16, 6 + totalKg * 0.2));
-}
-
 // Ship mode route colors - cycle through palette for different routes
 const ROUTE_COLORS = ['#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
 
@@ -60,15 +44,24 @@ export const FishingSpotMap: React.FC<FishingSpotMapProps> = ({
     if (!containerRef.current || mapRef.current) return;
 
     const defaultCenter: L.LatLngExpression = [33.0, 135.0];
-    mapRef.current = L.map(containerRef.current, { maxZoom: 13 }).setView(defaultCenter, 7);
+    mapRef.current = L.map(containerRef.current, { maxZoom: 18 }).setView(defaultCenter, 7);
 
-    L.tileLayer(
-      'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}',
-      {
-        attribution: 'Tiles &copy; Esri',
-        maxZoom: 13,
-      },
-    ).addTo(mapRef.current);
+    // High-resolution base map for zoomed-in readability
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+    }).addTo(mapRef.current);
+
+    // GEBCO shaded relief overlay for bathymetry context
+    L.tileLayer.wms('https://wms.gebco.net/mapserv?', {
+      layers: 'GEBCO_LATEST',
+      format: 'image/png',
+      transparent: true,
+      opacity: 0.45,
+      version: '1.3.0',
+      maxZoom: 13,
+      attribution: 'Imagery reproduced from GEBCO_2024 Grid, GEBCO Compilation Group (2024)',
+    }).addTo(mapRef.current);
 
     layerGroupRef.current = L.layerGroup().addTo(mapRef.current);
 

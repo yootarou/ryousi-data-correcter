@@ -1,5 +1,17 @@
 # 作業ログ
 
+## 航路ページの投縄/回収導線追加（2026-03-27）
+
+- 要望: 航路記録ページのマップ下に「投縄記録」「帰港」ボタンを表示し、投縄登録後に「投縄中」表示付きの一覧から回収記録へ進める導線を追加したい。
+- 実装: `frontend/src/services/db/retrievals.ts` に `getByRecordId(recordId)` を追加し、投縄記録群に対応する回収記録を一括取得できるようにした。
+- 実装: `frontend/src/hooks/useRouteData.ts` を拡張し、航路点・投縄・回収を並行取得して `retrievals` を返却するように変更した。
+- 実装: `frontend/src/pages/RoutePage.tsx` のマップ下に「投縄記録」「帰港」ボタンを追加し、投縄一覧カードを表示するUIを追加した。
+- 状態表示: 各投縄カードで回収の有無を判定し、未回収は「投縄中」、回収済みは「回収済み」バッジを表示。未回収カード押下で回収記録ページへ遷移、回収済みカードは誤操作防止のため押下不可にした。
+- ドキュメント: `docs/tasks.md` の変更履歴に、本導線追加をチェック付きで追記した。
+- 確認: 変更対象3ファイルのLintエラーなし。`frontend` で `npm run build` 成功（TypeScript/Viteビルド完了）。
+- 漁場マップ: `FishingSpotMap` を OpenStreetMap ベース + GEBCO WMS オーバーレイに変更。`VoyageSummary` の Leaflet に `maxZoom: 13` を設定。
+- 作業ログの重複見出しを整理した。
+
 ## GitHub リモートへのコミット（2025-03-27）
 
 - 当初リモート `origin` を SSH で設定したのち、利用者要望で **HTTPS** `https://github.com/yootarou/ryousi-data-correcter.git` に変更した。
