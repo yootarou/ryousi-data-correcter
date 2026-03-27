@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { routePointsRepo } from '@/services/db/routePoints';
 import { deploymentsRepo } from '@/services/db/deployments';
 import type { RoutePoint, Deployment } from '@/types';
@@ -8,23 +8,24 @@ export const useRouteData = (recordId: string | undefined) => {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!recordId) {
       setIsLoading(false);
       return;
     }
-
-    (async () => {
-      setIsLoading(true);
-      const [points, deps] = await Promise.all([
-        routePointsRepo.getByRecordId(recordId),
-        deploymentsRepo.getByRecordId(recordId),
-      ]);
-      setRoutePoints(points);
-      setDeployments(deps);
-      setIsLoading(false);
-    })();
+    setIsLoading(true);
+    const [points, deps] = await Promise.all([
+      routePointsRepo.getByRecordId(recordId),
+      deploymentsRepo.getByRecordId(recordId),
+    ]);
+    setRoutePoints(points);
+    setDeployments(deps);
+    setIsLoading(false);
   }, [recordId]);
 
-  return { routePoints, deployments, isLoading };
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return { routePoints, deployments, isLoading, reload: load };
 };

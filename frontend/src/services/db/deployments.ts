@@ -18,6 +18,10 @@ export const deploymentsRepo = {
     return await db.deployments.update(id, changes);
   },
 
+  async delete(id: string): Promise<void> {
+    await db.deployments.delete(id);
+  },
+
   async getAll(): Promise<Deployment[]> {
     return await db.deployments.toArray();
   },

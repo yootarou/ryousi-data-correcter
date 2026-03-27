@@ -13,6 +13,7 @@ class FishingRecord(Base):
     vessel_name: Mapped[str] = mapped_column(String, nullable=False)
     departure: Mapped[dict] = mapped_column(JSON, nullable=False)
     return_data: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    total_distance_km: Mapped[float | None] = mapped_column(Float, nullable=True)
     sync_status: Mapped[str] = mapped_column(String, default="synced")
     created_at: Mapped[str] = mapped_column(String, nullable=False)
     updated_at: Mapped[str] = mapped_column(String, nullable=False)

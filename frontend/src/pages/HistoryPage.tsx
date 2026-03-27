@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { fishingRecordsRepo } from '@/services/db/fishingRecords';
 import { deploymentsRepo } from '@/services/db/deployments';
+import { retrievalsRepo } from '@/services/db/retrievals';
+import { routePointsRepo } from '@/services/db/routePoints';
 import { formatDate } from '@/utils/formatters';
 import { formatDuration, calculateDwellTime } from '@/services/calculations/duration';
 import type { FishingRecord } from '@/types';
@@ -60,6 +62,30 @@ const HistoryPage = () => {
     setSelectedRecord(null);
     setDeployments([]);
   }, []);
+
+  const deleteRecord = useCallback(async (record: FishingRecord) => {
+    if (!window.confirm(`${formatDate(record.date)}の記録を削除しますか？\nこの操作は元に戻せません。`)) {
+      return;
+    }
+
+    // Delete related data
+    const deps = await deploymentsRepo.getByRecordId(record.id);
+    for (const dep of deps) {
+      const retrieval = await retrievalsRepo.getByDeploymentId(dep.id);
+      if (retrieval) {
+        await retrievalsRepo.delete(retrieval.id);
+      }
+    }
+    for (const dep of deps) {
+      await deploymentsRepo.delete(dep.id);
+    }
+    await routePointsRepo.deleteByRecordId(record.id);
+    await fishingRecordsRepo.delete(record.id);
+
+    // Refresh list and close modal
+    closeDetail();
+    await loadRecords();
+  }, [closeDetail, loadRecords]);
 
   const formatCurrency = (n: number) =>
     new Intl.NumberFormat('ja-JP').format(n);
@@ -348,6 +374,17 @@ const HistoryPage = () => {
                   )}
                 </div>
               )}
+
+              {/* Delete button */}
+              <div className="pt-4 border-t border-gray-200">
+                <button
+                  type="button"
+                  onClick={() => deleteRecord(selectedRecord)}
+                  className="w-full py-3 px-4 bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 rounded-xl font-semibold text-sm min-h-[44px] transition-colors duration-150"
+                >
+                  この記録を削除
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -18,6 +18,10 @@ export const retrievalsRepo = {
     return await db.retrievals.update(id, changes);
   },
 
+  async delete(id: string): Promise<void> {
+    await db.retrievals.delete(id);
+  },
+
   async getAll(): Promise<Retrieval[]> {
     return await db.retrievals.toArray();
   },

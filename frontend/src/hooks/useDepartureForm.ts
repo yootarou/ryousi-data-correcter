@@ -93,8 +93,9 @@ export const useDepartureForm = () => {
       await syncManager.enqueue('fishing_record', record, 1);
       setSaveSuccess(true);
 
+      // Navigate to route page for auto GPS tracking
       setTimeout(() => {
-        navigate('/');
+        navigate(`/route/${record.id}?autostart=1`);
       }, 1000);
     } finally {
       setIsSaving(false);

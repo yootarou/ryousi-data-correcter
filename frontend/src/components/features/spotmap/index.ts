@@ -1,0 +1,1 @@
+export { FishingSpotMap } from './FishingSpotMap';

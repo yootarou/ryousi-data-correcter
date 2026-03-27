@@ -67,6 +67,7 @@ class FishingRecordCreate(BaseModel):
     vessel_name: str
     departure: DepartureData
     return_data: ReturnData | None = None
+    total_distance_km: float | None = None
     sync_status: str = "synced"
     created_at: str
     updated_at: str
@@ -127,6 +128,7 @@ class FishingRecordResponse(BaseModel):
     vessel_name: str
     departure: DepartureData
     return_data: ReturnData | None = None
+    total_distance_km: float | None = None
     sync_status: str
     created_at: str
     updated_at: str

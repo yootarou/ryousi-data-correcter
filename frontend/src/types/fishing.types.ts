@@ -38,6 +38,7 @@ export interface FishingRecord {
   vessel_name: string;
   departure: DepartureData;
   return?: ReturnData;
+  total_distance_km?: number;
   sync_status: SyncStatus;
   created_at: string;
   updated_at: string;

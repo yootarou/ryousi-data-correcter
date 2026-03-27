@@ -12,6 +12,7 @@ const HistoryPage = lazy(() => import('@/pages/HistoryPage'));
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
 const RoutePage = lazy(() => import('@/pages/RoutePage'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
+const FishingSpotMapPage = lazy(() => import('@/pages/FishingSpotMapPage'));
 const ComponentsPage = lazy(() => import('@/pages/ComponentsPage'));
 
 const queryClient = new QueryClient({
@@ -43,6 +44,7 @@ function App() {
               <Route path="/return/:recordId" element={<ReturnPage />} />
               <Route path="/route/:recordId" element={<RoutePage />} />
               <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/spotmap" element={<FishingSpotMapPage />} />
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="/components" element={<ComponentsPage />} />
