@@ -11,6 +11,7 @@
 - 確認: 変更対象3ファイルのLintエラーなし。`frontend` で `npm run build` 成功（TypeScript/Viteビルド完了）。
 - 漁場マップ: `FishingSpotMap` を OpenStreetMap ベース + GEBCO WMS オーバーレイに変更。`VoyageSummary` の Leaflet に `maxZoom: 13` を設定。
 - 作業ログの重複見出しを整理した。
+- コミット `9201138` を `origin/main`（HTTPS）へ push した。
 
 ## GitHub リモートへのコミット（2025-03-27）
 
