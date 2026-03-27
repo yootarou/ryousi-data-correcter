@@ -1,0 +1,179 @@
+@import 'tailwindcss';
+
+/* ===== Tailwind v4 Theme Customization ===== */
+@theme {
+  /* Primary - Ocean Blue */
+  --color-ocean-50: #eff6ff;
+  --color-ocean-100: #dbeafe;
+  --color-ocean-200: #bfdbfe;
+  --color-ocean-300: #93c5fd;
+  --color-ocean-400: #60a5fa;
+  --color-ocean-500: #3b82f6;
+  --color-ocean-600: #2563eb;
+  --color-ocean-700: #1d4ed8;
+  --color-ocean-800: #1e40af;
+  --color-ocean-900: #1e3a8a;
+
+  /* Accent - Sea Green */
+  --color-sea-50: #ecfdf5;
+  --color-sea-100: #d1fae5;
+  --color-sea-200: #a7f3d0;
+  --color-sea-300: #6ee7b7;
+  --color-sea-400: #34d399;
+  --color-sea-500: #10b981;
+  --color-sea-600: #059669;
+  --color-sea-700: #047857;
+
+  /* Font */
+  --font-sans: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+}
+
+/* ===== CSS Variables ===== */
+:root {
+  /* Layout */
+  --header-height: 60px;
+  --bottom-nav-height: 64px;
+  --min-tap-size: 44px;
+  --max-content-width: 640px;
+  --page-padding: 16px;
+
+  /* Transition */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* ===== Reset & Base ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-gray-900);
+  background-color: var(--color-gray-50);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ===== Typography ===== */
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ===== Safe Area (iOS) ===== */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ===== Layout ===== */
+.main-content {
+  padding-top: var(--header-height);
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  min-height: 100dvh;
+  overflow-y: auto;
+}
+
+/* ===== Form Elements ===== */
+input,
+select,
+textarea {
+  font-size: 16px; /* iOS zoom prevention */
+  font-family: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--color-ocean-500);
+  outline-offset: -1px;
+}
+
+/* ===== Tap Target ===== */
+button,
+a,
+[role='button'] {
+  min-height: var(--min-tap-size);
+  min-width: var(--min-tap-size);
+}
+
+/* ===== Card ===== */
+.card {
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid var(--color-gray-100);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  padding: 16px;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-gray-300);
+  border-radius: 9999px;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal) ease-out;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
