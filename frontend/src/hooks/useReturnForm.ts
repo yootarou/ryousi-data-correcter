@@ -1,6 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { fishingRecordsRepo } from '@/services/db/fishingRecords';
+import { deploymentsRepo } from '@/services/db/deployments';
+import { retrievalsRepo } from '@/services/db/retrievals';
 import { syncManager } from '@/services/sync/SyncManager';
 import type { ReturnData } from '@/types';
 
@@ -26,6 +28,7 @@ export const useReturnForm = () => {
   const [errors, setErrors] = useState<ReturnErrors>({});
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [businessError, setBusinessError] = useState<string | null>(null);
   const [vesselName, setVesselName] = useState('');
   const [departureTime, setDepartureTime] = useState('');
   const [departurePort, setDeparturePort] = useState('');
@@ -54,22 +57,55 @@ export const useReturnForm = () => {
       if (errors[field]) {
         setErrors((prev) => ({ ...prev, [field]: undefined }));
       }
+      if (businessError) {
+        setBusinessError(null);
+      }
     },
-    [errors],
+    [errors, businessError],
   );
 
-  const validate = useCallback((): boolean => {
+  const validate = useCallback(async (): Promise<boolean> => {
     const e: ReturnErrors = {};
 
     if (!data.fishing_end_time) e.fishing_end_time = '帰港時刻は必須です';
     if (!data.return_port.trim()) e.return_port = '帰港地は必須です';
 
     setErrors(e);
-    return Object.keys(e).length === 0;
-  }, [data]);
+    if (Object.keys(e).length > 0) {
+      return false;
+    }
+
+    if (!recordId) {
+      return false;
+    }
+
+    const [deployments, retrievals] = await Promise.all([
+      deploymentsRepo.getByRecordId(recordId),
+      retrievalsRepo.getByRecordId(recordId),
+    ]);
+
+    if (deployments.length === 0) {
+      setBusinessError('まだ投縄記録が登録されていません');
+      return false;
+    }
+
+    const retrievedDeploymentIds = new Set(retrievals.map((retrieval) => retrieval.deployment_id));
+    const hasUnretrievedDeployment = deployments.some(
+      (deployment) => !retrievedDeploymentIds.has(deployment.id),
+    );
+
+    if (hasUnretrievedDeployment) {
+      setBusinessError('未回収の投縄があります（回収記録を登録してください）');
+      return false;
+    }
+
+    setBusinessError(null);
+    return true;
+  }, [data, recordId]);
 
   const save = useCallback(async () => {
-    if (!validate() || !recordId) return;
+    if (!recordId) return;
+    if (!(await validate())) return;
 
     setIsSaving(true);
     try {
@@ -97,6 +133,7 @@ export const useReturnForm = () => {
     errors,
     isSaving,
     saveSuccess,
+    businessError,
     vesselName,
     departureTime,
     departurePort,

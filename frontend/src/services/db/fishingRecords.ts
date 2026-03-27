@@ -7,7 +7,16 @@ export const fishingRecordsRepo = {
   },
 
   async getByDate(date: string): Promise<FishingRecord | undefined> {
-    return await db.fishing_records.where('date').equals(date).first();
+    const records = await db.fishing_records.where('date').equals(date).toArray();
+    if (records.length === 0) return undefined;
+    return records.sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+  },
+
+  async getActiveByDate(date: string): Promise<FishingRecord | undefined> {
+    const records = await db.fishing_records.where('date').equals(date).toArray();
+    const activeRecords = records.filter((record) => !record.return);
+    if (activeRecords.length === 0) return undefined;
+    return activeRecords.sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
   },
 
   async create(record: FishingRecord): Promise<string> {
@@ -23,11 +32,15 @@ export const fishingRecordsRepo = {
   },
 
   async getRecent(limit: number = 10): Promise<FishingRecord[]> {
-    return await db.fishing_records.orderBy('date').reverse().limit(limit).toArray();
+    const records = await db.fishing_records.orderBy('date').reverse().toArray();
+    return records
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .slice(0, limit);
   },
 
   async getAll(): Promise<FishingRecord[]> {
-    return await db.fishing_records.orderBy('date').reverse().toArray();
+    const records = await db.fishing_records.orderBy('date').reverse().toArray();
+    return records.sort((a, b) => b.created_at.localeCompare(a.created_at));
   },
 
   async getByMonth(yearMonth: string): Promise<FishingRecord[]> {
@@ -39,7 +52,7 @@ export const fishingRecordsRepo = {
 
   async getToday(): Promise<FishingRecord | undefined> {
     const today = new Date().toISOString().slice(0, 10);
-    return await this.getByDate(today);
+    return (await this.getActiveByDate(today)) ?? (await this.getByDate(today));
   },
 
   async count(): Promise<number> {

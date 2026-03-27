@@ -18,11 +18,11 @@ interface DepartureFormProps {
 
 const CREW_OPTIONS = [
   { value: '船長', label: '船長' },
-  { value: '一等航海士', label: '一等航海士' },
-  { value: '機関長', label: '機関長' },
-  { value: '甲板員A', label: '甲板員A' },
-  { value: '甲板員B', label: '甲板員B' },
-  { value: '甲板員C', label: '甲板員C' },
+  { value: '悠馬', label: '悠馬' },
+  { value: 'TOMO', label: 'TOMO' },
+  { value: '伊藤', label: '伊藤' },
+  { value: '裕輝', label: '裕輝' },
+  { value: '陽太郎', label: '陽太郎' },
 ];
 
 const SPECIES_OPTIONS = [

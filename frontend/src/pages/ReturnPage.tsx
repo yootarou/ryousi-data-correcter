@@ -6,6 +6,7 @@ const ReturnPage = () => {
   const {
     data,
     errors,
+    businessError,
     isSaving,
     saveSuccess,
     vesselName,
@@ -40,6 +41,7 @@ const ReturnPage = () => {
       <ReturnForm
         data={data}
         errors={errors}
+        businessError={businessError}
         isSaving={isSaving}
         saveSuccess={saveSuccess}
         vesselName={vesselName}

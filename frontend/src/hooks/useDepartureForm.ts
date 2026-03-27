@@ -77,25 +77,41 @@ export const useDepartureForm = () => {
     try {
       const today = new Date().toISOString().slice(0, 10);
       const now = new Date().toISOString();
+      const activeRecord = await fishingRecordsRepo.getActiveByDate(today);
 
-      const record: FishingRecord = {
-        id: crypto.randomUUID(),
-        user_id: 'default-user',
-        date: today,
-        vessel_name: data.vessel_name,
-        departure: data,
-        sync_status: 'pending',
-        created_at: now,
-        updated_at: now,
-      };
-
-      await fishingRecordsRepo.create(record);
-      await syncManager.enqueue('fishing_record', record, 1);
+      if (activeRecord) {
+        const updatedRecord: FishingRecord = {
+          ...activeRecord,
+          vessel_name: data.vessel_name,
+          departure: data,
+          sync_status: 'pending',
+          updated_at: now,
+        };
+        await fishingRecordsRepo.update(activeRecord.id, {
+          vessel_name: data.vessel_name,
+          departure: data,
+          sync_status: 'pending',
+          updated_at: now,
+        });
+        await syncManager.enqueue('fishing_record', updatedRecord, 1);
+      } else {
+        const record: FishingRecord = {
+          id: crypto.randomUUID(),
+          user_id: 'default-user',
+          date: today,
+          vessel_name: data.vessel_name,
+          departure: data,
+          sync_status: 'pending',
+          created_at: now,
+          updated_at: now,
+        };
+        await fishingRecordsRepo.create(record);
+        await syncManager.enqueue('fishing_record', record, 1);
+      }
       setSaveSuccess(true);
 
-      // Navigate to route page for auto GPS tracking
       setTimeout(() => {
-        navigate(`/route/${record.id}?autostart=1`);
+        navigate('/departure?autostart=1', { replace: true });
       }, 1000);
     } finally {
       setIsSaving(false);

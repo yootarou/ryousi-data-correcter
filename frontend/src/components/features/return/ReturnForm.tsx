@@ -9,6 +9,7 @@ import type { ReturnErrors } from '@/hooks/useReturnForm';
 interface ReturnFormProps {
   data: ReturnData;
   errors: ReturnErrors;
+  businessError?: string | null;
   isSaving: boolean;
   saveSuccess: boolean;
   vesselName: string;
@@ -20,6 +21,7 @@ interface ReturnFormProps {
 export const ReturnForm: React.FC<ReturnFormProps> = ({
   data,
   errors,
+  businessError = null,
   isSaving,
   saveSuccess,
   vesselName: _vesselName,
@@ -45,6 +47,12 @@ export const ReturnForm: React.FC<ReturnFormProps> = ({
       }}
       className="space-y-4"
     >
+      {businessError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {businessError}
+        </div>
+      )}
+
       {/* Section 1: Basic Info */}
       <FormSection title="基本情報" collapsible={false}>
         <TextInput
@@ -177,7 +185,7 @@ export const ReturnForm: React.FC<ReturnFormProps> = ({
           fullWidth
           loading={isSaving}
         >
-          帰港完了
+          航海を完了する
         </Button>
       )}
     </form>
